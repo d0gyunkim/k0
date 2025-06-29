@@ -122,8 +122,8 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               placeholder="이메일을 입력하세요"
-              onFocus={(e) => e.target.style.borderColor = '#4b6cb7'}
-              onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
+              onFocus={(e) => (e.target as HTMLInputElement).style.borderColor = '#4b6cb7'}
+              onBlur={(e) => (e.target as HTMLInputElement).style.borderColor = '#e1e5e9'}
             />
           </div>
 
@@ -152,8 +152,8 @@ export default function LoginPage() {
                 boxSizing: 'border-box'
               }}
               placeholder="비밀번호를 입력하세요"
-              onFocus={(e) => e.target.style.borderColor = '#4b6cb7'}
-              onBlur={(e) => e.target.style.borderColor = '#e1e5e9'}
+              onFocus={(e) => (e.target as HTMLInputElement).style.borderColor = '#4b6cb7'}
+              onBlur={(e) => (e.target as HTMLInputElement).style.borderColor = '#e1e5e9'}
             />
           </div>
 
@@ -187,8 +187,8 @@ export default function LoginPage() {
               transition: 'background 0.2s',
               marginBottom: 24
             }}
-            onMouseEnter={(e) => !loading && (e.target.style.background = '#3a5a9a')}
-            onMouseLeave={(e) => !loading && (e.target.style.background = '#4b6cb7')}
+            onMouseEnter={(e) => !loading && ((e.target as HTMLButtonElement).style.background = '#3a5a9a')}
+            onMouseLeave={(e) => !loading && ((e.target as HTMLButtonElement).style.background = '#4b6cb7')}
           >
             {loading ? '로그인 중...' : '로그인'}
           </button>

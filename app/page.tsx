@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from './supabaseClient';
 
@@ -11,175 +11,6 @@ const newsList = [
 ];
 
 /**
- * 상단 네비게이션 컴포넌트
- * 사용자 프로필과 로그인 상태를 관리하며, 프로필 카드 드롭다운 기능 제공
- */
-function TopNav() {
-  // 사용자 정보 상태 관리
-  const [user, setUser] = useState(null);
-  const [username, setUsername] = useState('');
-  const [showCard, setShowCard] = useState(false);
-  
-  // DOM 요소 참조 및 타이머 관리
-  const profileRef = useRef(null);
-  const cardRef = useRef(null);
-  const hideTimer = useRef(null);
-
-  // 컴포넌트 마운트 시 사용자 정보 가져오기
-  useEffect(() => {
-    const getUser = async () => {
-      // Supabase에서 현재 로그인된 사용자 정보 가져오기
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      
-      if (user) {
-        // 사용자가 로그인되어 있으면 profiles 테이블에서 username 가져오기
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('username')
-          .eq('id', user.id)
-          .single();
-        if (data && data.username) setUsername(data.username);
-      }
-    };
-    getUser();
-  }, []);
-
-  // 마우스 진입 시 프로필 카드 표시 (타이머 취소)
-  const handleMouseEnter = () => {
-    if (hideTimer.current) {
-      clearTimeout(hideTimer.current);
-      hideTimer.current = null;
-    }
-    setShowCard(true);
-  };
-  
-  // 마우스 이탈 시 200ms 후 프로필 카드 숨김 (부드러운 UX를 위한 지연)
-  const handleMouseLeave = () => {
-    hideTimer.current = setTimeout(() => {
-      setShowCard(false);
-    }, 200);
-  };
-
-  // 로그아웃 함수
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setUsername('');
-    setShowCard(false);
-  };
-
-  return (
-    <div
-      style={{
-        width: '100%',
-        height: 72,
-        background: '#fafcff',
-        boxShadow: '0 4px 16px #0002',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 4vw', // 반응형 padding
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 100,
-        borderBottomLeftRadius: 16,
-        borderBottomRightRadius: 16,
-        minWidth: 320,
-      }}
-    >
-      {/* 프로필 섹션 */}
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', marginRight: '2vw' }}>
-        {/* 프로필 이미지 컨테이너 */}
-        <div
-          ref={profileRef}
-          style={{
-            width: 48,
-            height: 48,
-            borderRadius: '50%',
-            overflow: 'hidden',
-            boxShadow: '0 2px 8px #0003',
-            border: showCard ? '2px solid #4b6cb7' : '2px solid #fff',
-            background: '#fff',
-            transition: 'border 0.2s',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 16,
-          }}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* 기본 프로필 이미지 */}
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
-            alt="profile"
-            style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '50%' }}
-          />
-        </div>
-        
-        {/* 프로필 드롭다운 카드 */}
-        {showCard && (
-          <div
-            ref={cardRef}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: 60,
-              background: '#fff',
-              boxShadow: '0 4px 16px #0002',
-              borderRadius: 12,
-              padding: '18px 24px',
-              minWidth: 160,
-              textAlign: 'center',
-              zIndex: 10,
-              fontWeight: 700,
-              color: '#222b45',
-              fontSize: 16,
-              transition: 'all 0.2s',
-              animation: 'fadeIn 0.2s',
-            }}
-          >
-            {/* 로그인 상태에 따라 다른 내용 표시 */}
-            {user ? (
-              <div>
-                <div style={{ marginBottom: 12, fontSize: 18 }}>
-                  {username || '사용자'}
-                </div>
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    background: '#e74c3c',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 8,
-                    padding: '8px 16px',
-                    fontSize: 14,
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'background 0.2s'
-                  }}
-                  onMouseEnter={(e) => (e.target as HTMLButtonElement).style.background = '#c0392b'}
-                  onMouseLeave={(e) => (e.target as HTMLButtonElement).style.background = '#e74c3c'}
-                >
-                  로그아웃
-                </button>
-              </div>
-            ) : (
-              <Link href="/login" style={{ color: '#4b6cb7', fontWeight: 700, textDecoration: 'none', fontSize: 18 }}>로그인</Link>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/**
  * 메인 홈페이지 컴포넌트
  * 뉴스 목록을 표시하고 카테고리별 필터링 기능 제공
  */
@@ -189,6 +20,8 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [user, setUser] = useState<any>(null);
+  const [username, setUsername] = useState('');
 
   // 뉴스 카테고리 정의
   const categories = [
@@ -201,6 +34,32 @@ export default function HomePage() {
     { key: 'social', label: '사회' },
     { key: 'culture', label: '문화' },
   ];
+
+  // 사용자 정보 가져오기
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', user.id)
+          .single();
+        if (data && data.username) setUsername(data.username);
+      } else {
+        setUsername('');
+      }
+    };
+    getUser();
+  }, []);
+
+  // 로그아웃 함수
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setUsername('');
+  };
 
   // 컴포넌트 마운트 시 뉴스 데이터 가져오기
   useEffect(() => {
@@ -266,10 +125,37 @@ export default function HomePage() {
         {/* 네비게이션 링크들 */}
         <Link href="/" style={{ color: '#222b45', textDecoration: 'none', marginRight: 24, fontSize: 18, fontWeight: 500, textAlign: 'center', padding: '10px 0', borderRadius: 8, transition: 'background 0.2s', display: 'block' }}>Home</Link>
         <Link href="/" style={{ color: '#222b45', textDecoration: 'none', marginRight: 24, fontSize: 18, fontWeight: 500, textAlign: 'center', padding: '10px 0', borderRadius: 8, transition: 'background 0.2s', display: 'block' }}>News</Link>
+        {/* 로그인/로그아웃 버튼 영역 */}
+        <div style={{ marginLeft: 'auto', marginRight: 32, display: 'flex', alignItems: 'center', gap: 12 }}>
+          {user ? (
+            <>
+              <span style={{ fontWeight: 700, color: '#4b6cb7', fontSize: 16 }}>{username || '사용자'}</span>
+              <button
+                onClick={handleLogout}
+                style={{
+                  background: '#e74c3c',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 8,
+                  padding: '8px 16px',
+                  fontSize: 14,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={e => (e.target as HTMLButtonElement).style.background = '#c0392b'}
+                onMouseLeave={e => (e.target as HTMLButtonElement).style.background = '#e74c3c'}
+              >
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <Link href="/login" style={{ color: '#4b6cb7', fontWeight: 700, fontSize: 16, textDecoration: 'none', padding: '8px 16px', borderRadius: 8, border: '1.5px solid #4b6cb7', background: '#fff', transition: 'background 0.2s' }}>
+              로그인
+            </Link>
+          )}
+        </div>
       </nav>
-      
-      {/* 상단 프로필 네비게이션 */}
-      <TopNav />
       
       {/* 메인 콘텐츠 영역 */}
       <main style={{ flex: 1, maxWidth: 800, margin: '0 auto', padding: 48, marginTop: 120, background: '#fafcff' }}>
