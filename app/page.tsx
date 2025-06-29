@@ -145,9 +145,6 @@ function TopNav() {
           </div>
         )}
       </div>
-      
-      {/* AI 챗봇 링크 */}
-      <Link href="/chatbot" style={{marginRight: 16}}>AI 챗봇</Link>
     </div>
   );
 }
@@ -239,7 +236,6 @@ export default function HomePage() {
         {/* 네비게이션 링크들 */}
         <Link href="/" style={{ color: '#222b45', textDecoration: 'none', marginRight: 24, fontSize: 18, fontWeight: 500, textAlign: 'center', padding: '10px 0', borderRadius: 8, transition: 'background 0.2s', display: 'block' }}>Home</Link>
         <Link href="/" style={{ color: '#222b45', textDecoration: 'none', marginRight: 24, fontSize: 18, fontWeight: 500, textAlign: 'center', padding: '10px 0', borderRadius: 8, transition: 'background 0.2s', display: 'block' }}>News</Link>
-        <Link href="/create" style={{ color: '#222b45', textDecoration: 'none', marginRight: 24, fontSize: 18, fontWeight: 500, textAlign: 'center', padding: '10px 0', borderRadius: 8, transition: 'background 0.2s', display: 'block' }}>Create</Link>
       </nav>
       
       {/* 상단 프로필 네비게이션 */}
