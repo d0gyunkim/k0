@@ -61,6 +61,14 @@ function TopNav() {
     }, 200);
   };
 
+  // 로그아웃 함수
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setUsername('');
+    setShowCard(false);
+  };
+
   return (
     <div
       style={{
@@ -125,20 +133,42 @@ function TopNav() {
               background: '#fff',
               boxShadow: '0 4px 16px #0002',
               borderRadius: 12,
-              padding: '18px 32px',
-              minWidth: 140,
+              padding: '18px 24px',
+              minWidth: 160,
               textAlign: 'center',
               zIndex: 10,
               fontWeight: 700,
               color: '#222b45',
-              fontSize: 18,
+              fontSize: 16,
               transition: 'all 0.2s',
               animation: 'fadeIn 0.2s',
             }}
           >
             {/* 로그인 상태에 따라 다른 내용 표시 */}
             {user ? (
-              <span>{username || '이름 없음'}</span>
+              <div>
+                <div style={{ marginBottom: 12, fontSize: 18 }}>
+                  {username || '사용자'}
+                </div>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    background: '#e74c3c',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => (e.target as HTMLButtonElement).style.background = '#c0392b'}
+                  onMouseLeave={(e) => (e.target as HTMLButtonElement).style.background = '#e74c3c'}
+                >
+                  로그아웃
+                </button>
+              </div>
             ) : (
               <Link href="/login" style={{ color: '#4b6cb7', fontWeight: 700, textDecoration: 'none', fontSize: 18 }}>로그인</Link>
             )}
